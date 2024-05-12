@@ -1,28 +1,19 @@
 import {Router, Request, Response} from 'express';
 import { createUserControler, deleteUserController, getUserByIdController, getUsersController, updateUserController } from '../controllers/users.controllers';
+import { validateUser } from '../utils/validations/users.validations';
 
 
 const router = Router()
 
 // Users routes
-router.get('/', (req: Request, res: Response) => {
-    getUsersController(req, res);
-});
+router.get('/', getUsersController);
 
-router.get('/:id', (req: Request, res: Response) => {
-    getUserByIdController(req, res);
-});
+router.get('/:id', getUserByIdController);
 
-router.post('/', (req: Request, res: Response) => {
-    createUserControler(req, res);
-});
+router.post('/', validateUser, createUserControler);
 
-router.put('/:id', (req: Request, res: Response) => {
-    updateUserController(req, res);
-});
+router.put('/:id', validateUser, updateUserController);
 
-router.delete('/:id', (req: Request, res: Response) => {
-    deleteUserController(req, res);
-});
+router.delete('/:id', deleteUserController);
 
 export default router;
