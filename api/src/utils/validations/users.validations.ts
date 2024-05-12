@@ -1,42 +1,31 @@
 import { Response, Request, NextFunction } from "express";
+import Joi, { ValidationResult } from "joi";
+
+export const userSchema = Joi.object({
+    id: Joi.number().integer().required(),
+    name: Joi.string().required(),
+    email: Joi.string().required(),
+    password: Joi.string().required().min(8)
+})
 
 
-export const validateUser = (req: Request, res: Response, next: NextFunction) => {
-    // Get data from request body
-    const {id, name, email, password} = req.body;
-    
-    // Create an array to store errors
-    const errors = [];
-
-    // Validate data
-    if (!id) {
-        errors.push('id is required');
-    }
-
-    if (!name) {
-        errors.push('name is required');
-    }
-
-    if (!email) {
-        errors.push('email is required');
-    }
-
-    if (!password) {
-        errors.push('password is required');
-    } else {
-        // Add more validations here
-        // e.g. password must be at least 8 chars long
-        if (password.length < 8) {
-            errors.push('password must be at least 8 chars long');
-        }
-    }
+export const validateUser = (
+    req: Request, 
+    res: Response, 
+    next: NextFunction
+) => {
+    // Validate user data
+    const result: ValidationResult = userSchema.validate(
+        req.body,
+        {abortEarly: false} // Return all errors
+        )
 
     // If there are errors
     // return 422 (Unprocessable Entity)
-    if (errors.length) {
+    if (result.error) {
         return res.status(422).json({
-        message: 'Validation failed',
-        errors,
+        message: 'Invalid request data',
+        errors: result.error.details.map(err => err.message)
         });
     }
 
